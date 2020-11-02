@@ -2,9 +2,13 @@ package restapi
 
 import (
 	"context"
+	"github.com/gorilla/mux"
 	"net"
 	"net/http"
+	"shorter/internal/restapi/handlers"
+	"shorter/internal/storage"
 	"shorter/pkg/logging"
+	"shorter/pkg/shorter"
 	"strconv"
 	"time"
 )
@@ -15,11 +19,20 @@ type RestAPI struct {
 	loggers *logging.Loggers
 }
 
-func New(port int, loggers *logging.Loggers) *RestAPI {
+func New(port int, loggers *logging.Loggers, storage storage.Storage, shorter shorter.Shorter) *RestAPI {
+	shortHandlers := handlers.NewShorter(
+		storage,
+		loggers,
+		shorter,
+	)
+
+	r := mux.NewRouter()
+	r.HandleFunc("/short", shortHandlers.Short)
+
 	return &RestAPI{
 		server: http.Server{
 			Addr: net.JoinHostPort("", strconv.Itoa(port)),
-			Handler: nil,
+			Handler: r,
 		},
 		loggers: loggers,
 		errors: make(chan error, 1),

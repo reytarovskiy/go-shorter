@@ -3,28 +3,27 @@ package main
 import (
 	"log"
 	"os"
-	"shorter/internal/restapi"
+	"shorter/internal/redirecter"
 	"shorter/internal/storage"
 	"shorter/pkg/logging"
-	"shorter/pkg/shorter"
 )
 
 func main() {
+	urlStorage := storage.NewMemoryStorage(map[string]string{
+		"laskfr3": "https://google.com",
+	})
 	loggers := &logging.Loggers{
 		Info: log.New(os.Stderr, "INFO: ", log.Lshortfile | log.Ltime),
 		Error: log.New(os.Stderr, "ERROR: ", log.Lshortfile | log.Ltime),
 	}
 
-	urlStorage := storage.NewMemoryStorage()
-	urlShorter := shorter.NewRandomShorter(7)
+	server := redirecter.NewRedirecter(9020, loggers, urlStorage)
+	server.Start()
 
-	rapi := restapi.New(9030, loggers, urlStorage, urlShorter)
-	rapi.Start()
+	err := <-server.Notify()
+	loggers.Error.Printf("Redirecter server error: %v", err)
 
-	err := <-rapi.Notify()
-	loggers.Error.Printf("Restapi server error: %v", err)
-
-	if err = rapi.Stop(); err != nil {
+	if err = server.Stop(); err != nil {
 		loggers.Error.Printf("Restapi server stopping error: %v", err)
 	}
 }
