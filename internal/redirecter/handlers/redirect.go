@@ -27,7 +27,12 @@ func (r *RedirectHandlers) Redirect(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	url := r.urlStorage.Get(shorts[1])
+	url, err := r.urlStorage.Get(shorts[1])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	if url == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return

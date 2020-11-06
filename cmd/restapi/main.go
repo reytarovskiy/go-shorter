@@ -15,7 +15,7 @@ func main() {
 		Error: log.New(os.Stderr, "ERROR: ", log.Lshortfile | log.Ltime),
 	}
 
-	urlStorage := storage.NewMemoryStorage()
+	urlStorage := storage.NewXmlStorage("/tmp/shorter.xml")
 	urlShorter := shorter.NewRandomShorter(7)
 
 	rapi := restapi.New(9030, loggers, urlStorage, urlShorter)

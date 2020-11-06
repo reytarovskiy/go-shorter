@@ -9,9 +9,7 @@ import (
 )
 
 func main() {
-	urlStorage := storage.NewMemoryStorage(map[string]string{
-		"laskfr3": "https://google.com",
-	})
+	urlStorage := storage.NewXmlStorage("/tmp/shorter.xml")
 	loggers := &logging.Loggers{
 		Info: log.New(os.Stderr, "INFO: ", log.Lshortfile | log.Ltime),
 		Error: log.New(os.Stderr, "ERROR: ", log.Lshortfile | log.Ltime),

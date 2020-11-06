@@ -44,7 +44,9 @@ func (s *Shorter) Short(w http.ResponseWriter, req *http.Request) {
 	}
 
 	short := s.shorter.Short(request.Url)
-	s.storage.Store(short, request.Url)
+	if err = s.storage.Store(short, request.Url); err != nil {
+		s.loggers.Error.Printf("Store error: %v", err)
+	}
 
 	json.NewEncoder(w).Encode(&shortResponse{
 		Short: short,
