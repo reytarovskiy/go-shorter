@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"shorter/internal/redirecter"
@@ -8,11 +9,15 @@ import (
 	"shorter/pkg/logging"
 )
 
+var storagePath = flag.String("xml-path", "/tmp/shorter.xml", "Storage xml path")
+
 func main() {
-	urlStorage := storage.NewXmlStorage("/tmp/shorter.xml")
+	flag.Parse()
+
+	urlStorage := storage.NewXmlStorage(*storagePath)
 	loggers := &logging.Loggers{
-		Info: log.New(os.Stderr, "INFO: ", log.Lshortfile | log.Ltime),
-		Error: log.New(os.Stderr, "ERROR: ", log.Lshortfile | log.Ltime),
+		Info:  log.New(os.Stderr, "INFO: ", log.Lshortfile|log.Ltime),
+		Error: log.New(os.Stderr, "ERROR: ", log.Lshortfile|log.Ltime),
 	}
 
 	server := redirecter.NewRedirecter(9020, loggers, urlStorage)

@@ -19,11 +19,12 @@ type RestAPI struct {
 	loggers *logging.Loggers
 }
 
-func New(port int, loggers *logging.Loggers, storage storage.Storage, shorter shorter.Shorter) *RestAPI {
+func New(port int, redirecterUrl string, loggers *logging.Loggers, storage storage.Storage, shorter shorter.Shorter) *RestAPI {
 	shortHandlers := handlers.NewShorter(
 		storage,
 		loggers,
 		shorter,
+		redirecterUrl,
 	)
 
 	r := mux.NewRouter()

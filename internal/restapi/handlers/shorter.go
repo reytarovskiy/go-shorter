@@ -15,20 +15,22 @@ type shortRequest struct {
 
 type shortResponse struct {
 	Short string `json:"short"`
-	Url string `json:"url"`
+	Url   string `json:"url"`
 }
 
 type Shorter struct {
-	storage storage.Storage
-	loggers *logging.Loggers
-	shorter shorter.Shorter
+	storage       storage.Storage
+	loggers       *logging.Loggers
+	shorter       shorter.Shorter
+	redirecterUrl string
 }
 
-func NewShorter(storage storage.Storage, loggers *logging.Loggers, shorter shorter.Shorter) *Shorter {
+func NewShorter(storage storage.Storage, loggers *logging.Loggers, shorter shorter.Shorter, redirecterUrl string) *Shorter {
 	return &Shorter{
-		storage: storage,
-		loggers: loggers,
-		shorter: shorter,
+		storage:       storage,
+		loggers:       loggers,
+		shorter:       shorter,
+		redirecterUrl: redirecterUrl,
 	}
 }
 
@@ -50,6 +52,6 @@ func (s *Shorter) Short(w http.ResponseWriter, req *http.Request) {
 
 	json.NewEncoder(w).Encode(&shortResponse{
 		Short: short,
-		Url: fmt.Sprintf("http://localhost/%s", short),
+		Url:   fmt.Sprintf("%s/%s", s.redirecterUrl, short),
 	})
 }
