@@ -2,7 +2,6 @@ package restapi
 
 import (
 	"context"
-	"github.com/gorilla/mux"
 	"net"
 	"net/http"
 	"shorter/internal/restapi/handlers"
@@ -27,23 +26,22 @@ func New(port int, redirecterUrl string, loggers *logging.Loggers, storage stora
 		redirecterUrl,
 	)
 
-	r := mux.NewRouter()
-	r.HandleFunc("/short", shortHandlers.Short)
+	http.HandleFunc("/short", shortHandlers.Short)
 
 	return &RestAPI{
 		server: http.Server{
-			Addr: net.JoinHostPort("", strconv.Itoa(port)),
-			Handler: r,
+			Addr:    net.JoinHostPort("", strconv.Itoa(port)),
+			Handler: nil,
 		},
 		loggers: loggers,
-		errors: make(chan error, 1),
+		errors:  make(chan error, 1),
 	}
 }
 
 func (r *RestAPI) Start() {
 	go func() {
 		r.loggers.Info.Printf("Restapi server started %s", r.server.Addr)
-		r.errors <-r.server.ListenAndServe()
+		r.errors <- r.server.ListenAndServe()
 	}()
 }
 
